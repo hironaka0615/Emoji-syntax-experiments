@@ -60,13 +60,13 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        /* テキストと数値入力欄のスタイルを統一 */
-        .form-group input[type="text"], .form-group input[type="number"] {
+        .form-group input[type="text"], .form-group select {
             padding: 5px;
             font-size: 16px;
         }
-        .date-inputs input[type="number"] {
-            text-align: center;
+        .date-inputs select {
+            font-size: 16px;
+            padding: 5px;
         }
     </style>
 </head>
@@ -141,9 +141,15 @@
                 <div class="form-group">
                     <label class="question-title">1. 生年月日</label>
                     <div class="date-inputs">
-                        <input type="number" id="birth_year" name="birth_year" min="1900" max="2026" style="width: 80px;" required> 年 
-                        <input type="number" id="birth_month" name="birth_month" min="1" max="12" style="width: 60px;" required> 月 
-                        <input type="number" id="birth_day" name="birth_day" min="1" max="31" style="width: 60px;" required> 日
+                        <select id="birth_year" name="birth_year" required>
+                            <option value="" disabled selected>選択</option>
+                        </select> 年 
+                        <select id="birth_month" name="birth_month" required>
+                            <option value="" disabled selected>選択</option>
+                        </select> 月 
+                        <select id="birth_day" name="birth_day" required>
+                            <option value="" disabled selected>選択</option>
+                        </select> 日
                     </div>
                 </div>
 
@@ -180,6 +186,39 @@
     </div>
 
     <script>
+        // --- 生年月日のプルダウンを自動生成する処理 ---
+        window.onload = function() {
+            const yearSelect = document.getElementById('birth_year');
+            const monthSelect = document.getElementById('birth_month');
+            const daySelect = document.getElementById('birth_day');
+
+            // 年 (現在の年から1900年まで)
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear; i >= 1900; i--) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                yearSelect.appendChild(option);
+            }
+
+            // 月 (1から12)
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                monthSelect.appendChild(option);
+            }
+
+            // 日 (1から31)
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+        };
+
+        // --- 画面遷移の処理 ---
         // Enterキーで同意画面へ
         document.addEventListener('keydown', function(event) {
             const introScreen = document.getElementById('intro-screen');
