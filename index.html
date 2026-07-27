@@ -8,7 +8,6 @@
         body {
             font-family: sans-serif;
             text-align: center;
-            /* 画面中央に配置するための設定 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,27 +16,18 @@
             margin: 0;
         }
         
-        /* 画面切り替え用のクラス（これをつけると非表示になる） */
+        /* 画面切り替え用のクラス */
         .hidden {
             display: none !important;
         }
 
-        /* 各画面のスタイル */
-        #intro-screen, #consent-screen {
+        #intro-screen, #consent-screen, #questionnaire-screen {
             width: 100%;
         }
 
-        /* 最初の画面の文字サイズ調整 */
-        #intro-screen h2 {
-            font-size: 2em;
-            margin-bottom: 40px;
-        }
-        #intro-screen p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
+        #intro-screen h2 { font-size: 2em; margin-bottom: 40px; }
+        #intro-screen p { font-size: 1.2em; margin-bottom: 30px; }
 
-        /* 同意画面のスタイル（先ほどと同じ） */
         .container {
             width: 80%;
             max-width: 800px;
@@ -57,51 +47,69 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        /* アンケートフォーム用のスタイル */
+        .form-group {
+            margin-bottom: 25px;
+            background-color: #f4f8ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .form-group label.question-title {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .form-group input[type="text"], .form-group input[type="date"] {
+            padding: 5px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1つ目の画面：導入 -->
+    <!-- 1. 導入画面 -->
     <div id="intro-screen">
         <h2>この度は、本研究へご協力いただきありがとうございます。</h2>
         <p>これから、本研究についての説明を行います。</p>
         <p><strong>Enterキー</strong>を押して次の画面に進んでください。</p>
     </div>
 
-    <!-- 2つ目の画面：同意書（最初は hidden クラスで隠しておく） -->
+    <!-- 2. 同意画面 -->
     <div id="consent-screen" class="hidden">
         <div class="container">
+            <h2>研究説明および参加同意</h2>
             <div class="consent-box">
-              　<h3>1. 研究タイトル</h3>
-                <p>絵文字は絵なのか文字なのか　ー語順と可逆性に基づく絵文字文の産出・理解の検証ー</p>
+                <h3>1. 研究タイトル</h3>
+                <p>絵文字は絵なのか文字なのか ー語順と可逆性に基づく絵文字文の産出・理解の検証ー</p>
                 
-              　<h3>2. 本研究の目的/意義</h3>
+                <h3>2. 本研究の目的/意義</h3>
                 <p>本研究の目的は、日本語母語話者が絵文字文をどのように産出/理解するかを検証することです。</p>
                                 
-              　<h3>3. 計測方法/内容</h3>
+                <h3>3. 計測方法/内容</h3>
                 <p>この計測は、オンラインで、参加者自身のパソコンを用いて行われます。所要時間は全体で15~20分で完了する見込みです。</p>
                 <p>計測は、事前アンケート・絵文字文の産出課題・絵文字文の理解課題の3つの段階で構成されます。</p>
                 
-              　<h3>4. 本研究の危険性</h3>
+                <h3>4. 本研究の危険性</h3>
                 <p>本研究および計測への参加において、参加者に危害や不利益が生じる可能性はありません。</p>
 
-             　 <h3>5. 計測への参加同意・撤回</h3>
+                <h3>5. 計測への参加同意・撤回</h3>
                 <p>計測への参加は任意です。また、計測参加に同意した後であっても、参加者の自由な意思によって、その同意を撤回することができます。</p>
                 <p>もし、同意を撤回する場合は、その旨を研究実施者にお申し出ください。同意を撤回した場合、当該参加者のすべてのデータは分析対象から除外し、個人が特定されない形での廃棄を行います。ただし、研究成果の発表後には、データは完全に匿名化され特定できない状態になるため、個人のデータを抽出して廃棄することはできません。</p>
 
-             　 <h3>6. 計測参加に対する謝礼</h3>
+                <h3>6. 計測参加に対する謝礼</h3>
                 <p>本計測への参加に対する、参加者への謝礼はございません。ご了承ください。</p>
                 
-             　 <h3>7. 計測結果の使用およびプライバシーの保護</h3>
+                <h3>7. 計測結果の使用およびプライバシーの保護</h3>
                 <p>事前アンケートにて、参加者の生年月日、性別、利き手、外国語学習歴などの個人情報を取得します。</p>
                 <p>計測終了後のデータ分析および研究成果の公表において、個人を特定できる情報を利用することはありません。また、取得されたデータは個人が特定されない形で保存・処理されます。</p>
-               
+                
                 <h3>8. 研究に関する資料等の開示</h3>
                 <p>参加計測者のうち、希望される方には、研究計画についての資料等を開示することができます。資料等の開示を希望する場合は、その旨を研究実施者にお申し出ください。</p>
 
-              　<h3>9. 研究実施者</h3>
+                <h3>9. 研究実施者</h3>
                 <p>中川裕輝（東京都立大学 人文社会学部 人間社会学科 言語科学教室 3年）</p>
-              　<p>メールアドレス： nakagawa-hiroki@ed.tmu.ac.jp</p>
+                <p>メールアドレス： nakagawa-hiroki@ed.tmu.ac.jp</p>
                 <p>計測参加への同意の撤回や資料等開示、その他質問などございましたらこちらのメールアドレスまでご連絡ください。</p>
             </div>
 
@@ -109,37 +117,89 @@
                 <p>上記の内容をすべて読み、計測への参加に同意される場合は以下にチェックをして「次へ進む」をクリックしてください。</p>
                 <label>
                     <input type="checkbox" id="agreeCheck" required>
-                    上記の内容に同意して、計測に参加します。
+                    <strong>上記の内容に同意して、計測に参加します。</strong>
                 </label>
                 <br><br>
                 <div style="text-align: center;">
-                    <button type="button" class="btn" onclick="nextPage()">次へ進む</button>
+                    <button type="button" class="btn" onclick="goToQuestionnaire()">次へ進む</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. アンケート画面 -->
+    <div id="questionnaire-screen" class="hidden">
+        <div class="container">
+            <h2>事前アンケート</h2>
+            <p>以下の項目にご回答をお願いいたします。</p>
+            
+            <form id="questionForm">
+                <div class="form-group">
+                    <label class="question-title">1. 生年月日</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="question-title">2. 性別</label>
+                    <label><input type="radio" name="gender" value="male" required> 男性</label> 
+                    <label><input type="radio" name="gender" value="female"> 女性</label> 
+                    <label><input type="radio" name="gender" value="other"> その他・回答しない</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="question-title">3. 利き手</label>
+                    <label><input type="radio" name="handedness" value="right" required> 右利き</label> 
+                    <label><input type="radio" name="handedness" value="left"> 左利き</label> 
+                    <label><input type="radio" name="handedness" value="both"> 両利き</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="question-title">4. 外国語の学習歴（例：英語10年、中国語2年 など）</label>
+                    <input type="text" id="lang_history" name="lang_history" style="width: 90%;" placeholder="入力してください" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="question-title">5. 言語障害および精神疾患の有無</label>
+                    <label><input type="radio" name="disorder" value="none" required> なし</label> 
+                    <label><input type="radio" name="disorder" value="exist"> あり</label>
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="button" class="btn" onclick="submitData()">アンケートを完了する</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // Enterキーが押されたときの処理
+        // Enterキーで同意画面へ
         document.addEventListener('keydown', function(event) {
             const introScreen = document.getElementById('intro-screen');
             const consentScreen = document.getElementById('consent-screen');
-            
-            // Enterキーが押され、かつ導入画面が表示されている場合
             if (event.key === 'Enter' && !introScreen.classList.contains('hidden')) {
-                // 導入画面を隠し、同意画面を表示する
                 introScreen.classList.add('hidden');
                 consentScreen.classList.remove('hidden');
             }
         });
 
-        // 「次へ進む」ボタンが押されたときの処理
-        function nextPage() {
+        // 同意してアンケート画面へ
+        function goToQuestionnaire() {
             const checkbox = document.getElementById('agreeCheck');
             if(checkbox.checked) {
-                alert('同意が確認されました。実際の運用ではここでアンケート画面へ移動します。');
+                document.getElementById('consent-screen').classList.add('hidden');
+                document.getElementById('questionnaire-screen').classList.remove('hidden');
             } else {
                 alert('調査に参加するには、同意のチェックボックスにチェックを入れてください。');
+            }
+        }
+
+        // アンケート完了ボタン
+        function submitData() {
+            const form = document.getElementById('questionForm');
+            if (form.checkValidity()) {
+                alert('回答が完了しました！実際の運用では、ここでスプレッドシートへデータを送信し、実験プログラムへ移行します。');
+            } else {
+                form.reportValidity();
             }
         }
     </script>
