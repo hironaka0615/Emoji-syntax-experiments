@@ -81,12 +81,10 @@
 <script>
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // デモ用にデータを画面に表示します
             jsPsych.data.displayData('json'); 
         }
     });
 
-    // 試行を作成する関数
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
             type: jsPsychHtmlKeyboardResponse,
@@ -114,7 +112,11 @@
                 let rt_first = null;
                 let backspace_count = 0;
                 let start_time = performance.now();
-                let is_finished = false; // 終了フラグ
+                let is_finished = false;
+                
+                // ★誤爆防止：画面表示から0.5秒間はEnterを無視するフラグ
+                let can_enter = false;
+                setTimeout(() => { can_enter = true; }, 500); 
 
                 const updateSlots = () => {
                     for(let i=0; i<max_slots; i++){
@@ -141,45 +143,37 @@
                     updateSlots();
                 };
 
-                // マウスクリックの監視
                 document.querySelectorAll('.choice-item').forEach(el => {
                     el.addEventListener('click', (e) => {
                         handleInput(e.currentTarget.dataset.val);
                     });
                 });
 
-                // ★修正点：前の画面のキー入力を引き継がないようにするための処理
-                let keydown_fired = {};
+                // ★修正点：シンプルに keydown（押し込んだ瞬間）だけを見る
                 const keydownHandler = (e) => {
-                    if (e.key === 'Backspace' || e.key === 'Enter') {
-                        e.preventDefault();
-                        keydown_fired[e.key] = true; // この画面で確実にキーが「押し込まれた」ことを記録
-                    }
-                };
-                
-                const keyupHandler = (e) => {
                     if (is_finished) return;
-                    // この画面で押し込まれたキーが「離された」時だけ処理する
-                    if (e.key === 'Backspace' && keydown_fired['Backspace']) {
+
+                    if (e.key === 'Backspace') {
                         e.preventDefault();
                         handleInput('⬅️');
-                        keydown_fired['Backspace'] = false;
-                    } else if (e.key === 'Enter' && keydown_fired['Enter']) {
+                    } else if (e.key === 'Enter') {
                         e.preventDefault();
+                        
+                        // 画面が出て0.5秒以内なら無視
+                        if (!can_enter) return;
+                        
+                        // キー押しっぱなしによる連続入力なら無視
+                        if (e.repeat) return; 
+                        
                         finishTrial();
-                        keydown_fired['Enter'] = false;
                     }
                 };
-                
                 document.addEventListener('keydown', keydownHandler);
-                document.addEventListener('keyup', keyupHandler);
 
                 const finishTrial = () => {
                     if(is_finished) return;
                     is_finished = true;
-                    // イベントリスナーを解除
                     document.removeEventListener('keydown', keydownHandler);
-                    document.removeEventListener('keyup', keyupHandler);
                     let rt_total = performance.now() - start_time;
                     
                     jsPsych.finishTrial({
@@ -191,11 +185,10 @@
                     });
                 };
 
-                // 完了ボタンのクリック監視
                 const btn = document.getElementById('btn-finish');
                 if(btn) {
                     btn.addEventListener('click', () => {
-                        finishTrial();
+                        if (can_enter) finishTrial(); // ボタンも0.5秒の誤爆防止を適用
                     });
                 }
             }
@@ -221,11 +214,7 @@
         conditional_function: function() {
             const last_trial = jsPsych.data.get().last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            if(JSON.stringify(last_trial.response) !== JSON.stringify(correct)) {
-                return true; 
-            } else {
-                return false; 
-            }
+            return JSON.stringify(last_trial.response) !== JSON.stringify(correct);
         }
     };
 
@@ -234,11 +223,7 @@
         loop_function: function() {
             const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            if(JSON.stringify(last_tut_data.response) !== JSON.stringify(correct)) {
-                return true; 
-            } else {
-                return false; 
-            }
+            return JSON.stringify(last_tut_data.response) !== JSON.stringify(correct);
         }
     };
     
@@ -273,7 +258,6 @@
         );
     }
 
-    // アンケート画面から引き継いだIDを紐付ける
     const participantId = sessionStorage.getItem("participantId") || "TEST_ID";
     jsPsych.data.addProperties({
         participant_id: participantId
