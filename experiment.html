@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>絵文字実験</title>
-    <!-- jsPsych v7の読み込み -->
     <script src="https://unpkg.com/jspsych@7.3.4"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
     
     <style>
-        /* 実験画面の見た目（CSS） */
         body {
             background-color: #f9f9f9;
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -20,14 +18,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            user-select: none; /* テキスト選択を防ぐ */
+            user-select: none;
         }
         #prompt-text {
             font-size: 22px;
             margin-bottom: 50px;
             height: 60px;
         }
-        /* 選択肢のグリッド（2段×6列など） */
         .choice-grid {
             display: grid;
             grid-template-columns: repeat(6, 60px);
@@ -40,7 +37,7 @@
             height: 60px;
             background-color: #fff;
             cursor: pointer;
-            font-size: 35px; /* 絵文字のサイズ */
+            font-size: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -49,9 +46,8 @@
             transition: transform 0.1s;
         }
         .choice-item:active {
-            transform: scale(0.9); /* クリックした時のへこむアニメーション */
+            transform: scale(0.9);
         }
-        /* 回答が入る枠 */
         .slot-container {
             display: flex;
             gap: 5px;
@@ -67,7 +63,6 @@
             align-items: center;
             justify-content: center;
         }
-        /* 完了ボタン */
         #finish-btn-container {
             position: absolute;
             bottom: 30px;
@@ -84,28 +79,18 @@
 </head>
 <body></body>
 <script>
-    // -----------------------------------------------------------------
-    // 1. jsPsychの初期化（実験終了時の処理）
-    // -----------------------------------------------------------------
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // ※とりあえず画面にデータを表示する仕様にしています。
-            // 本番ではここを「スプレッドシート(GAS)に送信する処理」に書き換えます。
-            const all_data = jsPsych.data.get().filterCustom(function(trial){
-                // チュートリアルや本番のデータだけを抽出
-                return trial.task === 'tutorial_1' || trial.task === 'tutorial_2' || trial.task === 'main_trial';
-            });
+            // デモ用にデータを画面に表示します
             jsPsych.data.displayData('json'); 
         }
     });
 
-    // -----------------------------------------------------------------
-    // 2. 試行を作成する「雛形」の関数
-    // -----------------------------------------------------------------
+    // 試行を作成する関数
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
             type: jsPsychHtmlKeyboardResponse,
-            choices: "NO_KEYS", // jsPsych標準のキー入力をオフにし、自作の処理に任せる
+            choices: "NO_KEYS", 
             data: { task: task_name }, 
             stimulus: function() {
                 let html = `<div id="exp-container">`;
@@ -125,123 +110,134 @@
                 return html;
             },
             on_load: function() {
-                let selected = []; // 選ばれた絵文字を入れる配列
+                let selected = []; 
                 let rt_first = null;
                 let backspace_count = 0;
                 let start_time = performance.now();
+                let is_finished = false; // 終了フラグ
 
                 const updateSlots = () => {
                     for(let i=0; i<max_slots; i++){
                         const slot = document.getElementById(`slot-${i}`);
-                        slot.innerHTML = selected[i] ? selected[i] : "";
+                        if(slot) slot.innerHTML = selected[i] ? selected[i] : "";
                     }
                 };
 
                 const handleInput = (val) => {
+                    if(is_finished) return;
                     if(rt_first === null) rt_first = performance.now() - start_time;
                     
                     if(val === '❌') {
-                        selected = []; // 全消し
+                        selected = [];
                         backspace_count++;
                     } else if (val === '⬅️') {
-                        selected.pop(); // 1つ戻る
+                        selected.pop();
                         backspace_count++;
                     } else {
                         if(selected.length < max_slots) {
-                            selected.push(val); // 枠が空いていれば追加
+                            selected.push(val);
                         }
                     }
                     updateSlots();
                 };
 
+                // マウスクリックの監視
                 document.querySelectorAll('.choice-item').forEach(el => {
                     el.addEventListener('click', (e) => {
                         handleInput(e.currentTarget.dataset.val);
                     });
                 });
 
-                const keyHandler = (e) => {
-                    if (e.key === 'Backspace') {
-                        e.preventDefault(); 
-                        handleInput('⬅️');
-                    } else if (e.key === 'Enter') {
+                // ★修正点：前の画面のキー入力を引き継がないようにするための処理
+                let keydown_fired = {};
+                const keydownHandler = (e) => {
+                    if (e.key === 'Backspace' || e.key === 'Enter') {
                         e.preventDefault();
-                        finishTrial();
+                        keydown_fired[e.key] = true; // この画面で確実にキーが「押し込まれた」ことを記録
                     }
                 };
-                document.addEventListener('keydown', keyHandler);
-
-                document.getElementById('btn-finish').addEventListener('click', () => {
-                    finishTrial();
-                });
+                
+                const keyupHandler = (e) => {
+                    if (is_finished) return;
+                    // この画面で押し込まれたキーが「離された」時だけ処理する
+                    if (e.key === 'Backspace' && keydown_fired['Backspace']) {
+                        e.preventDefault();
+                        handleInput('⬅️');
+                        keydown_fired['Backspace'] = false;
+                    } else if (e.key === 'Enter' && keydown_fired['Enter']) {
+                        e.preventDefault();
+                        finishTrial();
+                        keydown_fired['Enter'] = false;
+                    }
+                };
+                
+                document.addEventListener('keydown', keydownHandler);
+                document.addEventListener('keyup', keyupHandler);
 
                 const finishTrial = () => {
-                    document.removeEventListener('keydown', keyHandler); // キー監視を解除
+                    if(is_finished) return;
+                    is_finished = true;
+                    // イベントリスナーを解除
+                    document.removeEventListener('keydown', keydownHandler);
+                    document.removeEventListener('keyup', keyupHandler);
                     let rt_total = performance.now() - start_time;
                     
-                    // jsPsychにデータを保存して次の画面へ進む
                     jsPsych.finishTrial({
                         prompt: prompt_text,
-                        response: selected, // 並べた絵文字の配列
+                        response: selected, 
                         rt_first_click: rt_first ? Math.round(rt_first) : null,
                         rt_total: Math.round(rt_total),
                         backspace_count: backspace_count
                     });
                 };
+
+                // 完了ボタンのクリック監視
+                const btn = document.getElementById('btn-finish');
+                if(btn) {
+                    btn.addEventListener('click', () => {
+                        finishTrial();
+                    });
+                }
             }
         };
     }
 
-    // -----------------------------------------------------------------
-    // 3. タイムライン（実験の流れ）の作成
-    // -----------------------------------------------------------------
     const timeline = [];
 
-    // --- チュートリアル1 (1→2→3→4) ---
+    // --- チュートリアル1 ---
     const tutorial_1_prompt = '以下に表示される数字画像をクリックし、「1→2→3→4」の順番になるように並べ替えましょう。<br>入力が完了したら、Enterキーまたは「完了」ボタンを押してください。';
     const tutorial_1_choices = ['❌', '⬅️', '1', '2', '3', '4'];
     
-    // チュートリアル1のメイン試行
     const trial_tut_1 = createEmojiTrial('tutorial_1', tutorial_1_prompt, tutorial_1_choices, 8);
 
-    // エラー画面
     const error_screen_1 = {
         type: jsPsychHtmlKeyboardResponse,
         stimulus: '<h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p>',
         choices: ['Enter']
     };
     
-    // 条件分岐ノード: 直前の反応が不正解ならエラー画面を出す
     const conditional_error_1 = {
         timeline: [error_screen_1],
         conditional_function: function() {
-            // get().last(1)で直前の試行データを取得
             const last_trial = jsPsych.data.get().last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            
-            // JSON.stringifyで配列の中身を比較
             if(JSON.stringify(last_trial.response) !== JSON.stringify(correct)) {
-                return true; // 不正解ならエラー画面(timeline)を実行
+                return true; 
             } else {
-                return false; // 正解ならエラー画面はスキップ
+                return false; 
             }
         }
     };
 
-    // ループノード: 試行とエラー判定をセットにして、間違えている限りループする
     const tutorial_1_loop = {
         timeline: [trial_tut_1, conditional_error_1],
         loop_function: function() {
-            // ここでは last(2) を使わないといけません。
-            // 理由は、エラー画面が出た場合、last(1) は「エラー画面」のデータになってしまうからです。
-            // task名を指定して抽出するのが一番安全です。
             const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            
             if(JSON.stringify(last_tut_data.response) !== JSON.stringify(correct)) {
-                return true; // 不正解なら最初に戻ってループ
+                return true; 
             } else {
-                return false; // 正解ならループを抜ける
+                return false; 
             }
         }
     };
@@ -254,14 +250,12 @@
     timeline.push(tutorial_1_loop);
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>正解です！</h2><p>Enterキーを押して次の練習に進んでください。</p>',
+        stimulus: '<h2>正解です！</h2><p>Enterキーを押して本番に進んでください。</p>',
         choices: ['Enter']
     });
 
     // --- 本計測 (Trial) ---
     const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
-    
-    // csvの代わりに、JavaScriptの配列で刺激リストを作ります
     const stimuli_list = [
         { prompt: "男の子がリンゴを切る" },
         { prompt: "女の子が犬を走らせる" }
@@ -273,23 +267,18 @@
         choices: ['Enter']
     });
 
-    // 刺激リストの数だけ、本番の試行を作ってタイムラインに追加
     for (let i = 0; i < stimuli_list.length; i++) {
         timeline.push(
             createEmojiTrial('main_trial', stimuli_list[i].prompt, emoji_choices, 9)
         );
     }
 
-    // -----------------------------------------------------------------
-    // 4. 実験スタート
-    // -----------------------------------------------------------------
-    // アンケート画面から引き継いだIDを実験データに紐付ける
+    // アンケート画面から引き継いだIDを紐付ける
     const participantId = sessionStorage.getItem("participantId") || "TEST_ID";
     jsPsych.data.addProperties({
         participant_id: participantId
     });
 
     jsPsych.run(timeline);
-
 </script>
 </html>
