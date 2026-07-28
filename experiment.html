@@ -78,19 +78,56 @@
     </style>
 </head>
 <body></body>
-<script>
-    const jsPsych = initJsPsych({
-        on_finish: function() {
-            jsPsych.data.displayData('json'); 
-        }
-    });
+
 
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
             type: jsPsychHtmlKeyboardResponse,
             choices: "NO_KEYS", 
             data: { task: task_name }, 
-            stimulus: function() {
+            stimulus: function() {<script>
+    // -----------------------------------------------------------------
+    // 1. jsPsychの初期化（実験終了時の処理）
+    // -----------------------------------------------------------------
+    const jsPsych = initJsPsych({
+        on_finish: function() {
+            // 1. 本番のデータ（とチュートリアル）を抽出する
+            const exp_data = jsPsych.data.get().filterCustom(function(trial){
+                return trial.task === 'tutorial_1' || trial.task === 'tutorial_2' || trial.task === 'main_trial';
+            }).values();
+
+            // 2. 画面を「送信中」のメッセージに切り替える
+            document.body.innerHTML = `
+                <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
+                    <h2>実験が終了しました。</h2>
+                    <p>現在、データを安全に送信しています。この画面を閉じずにお待ちください...</p>
+                    <p id="status-text" style="color: blue;"></p>
+                </div>
+            `;
+
+            // 3. GAS（スプレッドシート）へデータを送信する
+            // ▼ ここに新しく作った実験用のGASのURLを貼り付けます ▼
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwtal0J1fanLGINlp0GWe7Y7NNyZ_xqvRXecGPIDKhsZhdDGz-GxV36FzAPI1r4TDMoYw/exec';
+
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(exp_data)
+            })
+            .then(response => {
+                // 送信完了したら画面の文字を変える
+                document.getElementById('status-text').style.color = "green";
+                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じてください。</b>";
+            })
+            .catch(error => {
+                // エラー時の処理
+                document.getElementById('status-text').style.color = "red";
+                document.getElementById('status-text').innerHTML = "<b>通信エラーが発生しました。インターネット接続を確認してください。</b>";
+            });
+        }
+    });
+
+    // -----------------------------------------------------------------
                 let html = `<div id="exp-container">`;
                 html += `<div id="prompt-text">${prompt_text}</div>`;
                 html += `<div class="choice-grid">`;
