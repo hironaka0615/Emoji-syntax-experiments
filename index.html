@@ -247,9 +247,14 @@
             // 必須項目が全て入力されているかチェック
             if (form.checkValidity()) {
                 
+                // ★追加：ここで参加者IDを作成し、ブラウザに一時保存する
+                const participantId = "ID_" + Date.now();
+                sessionStorage.setItem("participantId", participantId); 
+                
                 // 1. フォームに入力されたデータをまとめて取得する
                 const formData = new FormData(form);
                 const data = {
+                    participantId: participantId, // ★追加：アンケートデータと一緒にIDも送る
                     birth_year: formData.get('birth_year'),
                     birth_month: formData.get('birth_month'),
                     birth_day: formData.get('birth_day'),
@@ -274,7 +279,7 @@
         }
 
         // ▼ GASへデータを送信する処理 ▼
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbw8ELix2CzXj2OdgOzXgVYcCKjk49JOV2K9Y_ygEHTMV4x4vO-YkxKeZL6Y1moTH6NF_g/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby4fjUA9EyHjlULt1togsjfAE8Fik1w7LySqaFZHAotaQB-60yvZKBRwaPW3MQORiFjqg/exec';
 
         function sendData(experimentData) {
             fetch(scriptURL, {
@@ -286,18 +291,13 @@
                 console.log('送信成功:', response);
                 alert('回答が完了しました！実験プログラムへ移動します。');
                 
-                // 参加者IDを生成して一時保存（アンケートデータと実験データを紐づけるため）
-                const participantId = "ID_" + Date.now();
-                sessionStorage.setItem("participantId", participantId); 
-                
-                // 同じフォルダにある「experiment.html」へ移動する
+                // ID作成は上に移動したので、ここは純粋に画面移動だけ行います
                 window.location.href = "experiment.html"; 
             })
             .catch(error => {
                 console.error('送信エラー:', error);
                 alert('通信エラーが発生しました。もう一度お試しください。');
                 
-                // エラーになったらボタンを元に戻す
                 const submitBtn = document.querySelector('button[onclick="submitData()"]');
                 submitBtn.disabled = false;
                 submitBtn.innerText = "アンケートを完了する";
