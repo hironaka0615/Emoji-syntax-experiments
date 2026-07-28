@@ -243,23 +243,62 @@
         // アンケート完了ボタン
         function submitData() {
             const form = document.getElementById('questionForm');
+            
+            // 必須項目が全て入力されているかチェック
             if (form.checkValidity()) {
-                alert('回答が完了しました！実際の運用では、ここでスプレッドシートへデータを送信し、実験プログラムへ移行します。');
+                
+                // 1. フォームに入力されたデータをまとめて取得する
+                const formData = new FormData(form);
+                const data = {
+                    birth_year: formData.get('birth_year'),
+                    birth_month: formData.get('birth_month'),
+                    birth_day: formData.get('birth_day'),
+                    gender: formData.get('gender'),
+                    handedness: formData.get('handedness'),
+                    lang_history: formData.get('lang_history'),
+                    disorder: formData.get('disorder')
+                };
+
+                // 2. 送信ボタンを「送信中...」にして連打を防ぐ
+                const submitBtn = document.querySelector('button[onclick="submitData()"]');
+                submitBtn.disabled = true;
+                submitBtn.innerText = "送信中...";
+
+                // 3. データ送信関数を呼び出す
+                sendData(data);
+                
             } else {
+                // 入力漏れがあれば警告を出す
                 form.reportValidity();
             }
         }
-        // ▼scriptタグの一番下に追加する部分▼
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxQachr1n4ErMepWy2baLeT6A2oPDwkdCxnTVIvkdxi8moQ8H59EEVaopLqNcMxvFv9dg/exec';
 
-function sendData(experimentData) {
-    fetch(scriptURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(experimentData)
-    })
-    // ...略（thenやcatchの処理）...
-}
+        // ▼ GASへデータを送信する処理 ▼
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxQachr1n4ErMepWy2baLeT6A2oPDwkdCxnTVIvkdxi8moQ8H59EEVaopLqNcMxvFv9dg/exec';
+
+        function sendData(experimentData) {
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(experimentData)
+            })
+            .then(response => {
+                console.log('送信成功:', response);
+                alert('回答が完了しました！データがスプレッドシートに送信されました。');
+                
+                // ※ここに、実際の実験プログラム画面へ遷移するコードを追加します
+                
+            })
+            .catch(error => {
+                console.error('送信エラー:', error);
+                alert('通信エラーが発生しました。もう一度お試しください。');
+                
+                // エラーになったらボタンを元に戻す
+                const submitBtn = document.querySelector('button[onclick="submitData()"]');
+                submitBtn.disabled = false;
+                submitBtn.innerText = "アンケートを完了する";
+            });
+        }
     </script>
 
 </body>
