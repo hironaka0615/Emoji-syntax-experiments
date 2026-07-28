@@ -100,16 +100,14 @@
     });
 
     // -----------------------------------------------------------------
-    // 2. 試行を作成する「雛形」の関数（今回の心臓部です！）
+    // 2. 試行を作成する「雛形」の関数
     // -----------------------------------------------------------------
-    // この関数に「課題文」と「選択肢」を渡すだけで、PTBと同じ画面が作れます。
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
             type: jsPsychHtmlKeyboardResponse,
             choices: "NO_KEYS", // jsPsych標準のキー入力をオフにし、自作の処理に任せる
             data: { task: task_name }, 
             stimulus: function() {
-                // HTMLを生成
                 let html = `<div id="exp-container">`;
                 html += `<div id="prompt-text">${prompt_text}</div>`;
                 html += `<div class="choice-grid">`;
@@ -127,13 +125,11 @@
                 return html;
             },
             on_load: function() {
-                // === 画面が表示された直後に走るプログラム ===
                 let selected = []; // 選ばれた絵文字を入れる配列
                 let rt_first = null;
                 let backspace_count = 0;
                 let start_time = performance.now();
 
-                // 下の枠の表示を更新する処理
                 const updateSlots = () => {
                     for(let i=0; i<max_slots; i++){
                         const slot = document.getElementById(`slot-${i}`);
@@ -141,7 +137,6 @@
                     }
                 };
 
-                // 入力があった時の処理（クリックでもキーボードでも呼ばれる）
                 const handleInput = (val) => {
                     if(rt_first === null) rt_first = performance.now() - start_time;
                     
@@ -159,17 +154,15 @@
                     updateSlots();
                 };
 
-                // マウスクリックの監視
                 document.querySelectorAll('.choice-item').forEach(el => {
                     el.addEventListener('click', (e) => {
                         handleInput(e.currentTarget.dataset.val);
                     });
                 });
 
-                // キーボード(Backspace / Enter)の監視
                 const keyHandler = (e) => {
                     if (e.key === 'Backspace') {
-                        e.preventDefault(); // ブラウザバックを防ぐ
+                        e.preventDefault(); 
                         handleInput('⬅️');
                     } else if (e.key === 'Enter') {
                         e.preventDefault();
@@ -178,12 +171,10 @@
                 };
                 document.addEventListener('keydown', keyHandler);
 
-                // 完了ボタンのクリック監視
                 document.getElementById('btn-finish').addEventListener('click', () => {
                     finishTrial();
                 });
 
-                // 試行終了の処理
                 const finishTrial = () => {
                     document.removeEventListener('keydown', keyHandler); // キー監視を解除
                     let rt_total = performance.now() - start_time;
@@ -209,35 +200,52 @@
     // --- チュートリアル1 (1→2→3→4) ---
     const tutorial_1_prompt = '以下に表示される数字画像をクリックし、「1→2→3→4」の順番になるように並べ替えましょう。<br>入力が完了したら、Enterキーまたは「完了」ボタンを押してください。';
     const tutorial_1_choices = ['❌', '⬅️', '1', '2', '3', '4'];
+    
+    // チュートリアル1のメイン試行
     const trial_tut_1 = createEmojiTrial('tutorial_1', tutorial_1_prompt, tutorial_1_choices, 8);
 
-    // チュートリアル1のエラー画面（間違えた時だけ出る）
+    // エラー画面
     const error_screen_1 = {
         type: jsPsychHtmlKeyboardResponse,
         stimulus: '<h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p>',
         choices: ['Enter']
     };
+    
+    // 条件分岐ノード: 直前の反応が不正解ならエラー画面を出す
     const conditional_error_1 = {
         timeline: [error_screen_1],
         conditional_function: function() {
-            // 直前のチュートリアル1の回答をチェック
-            const last_res = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0].response;
+            // get().last(1)で直前の試行データを取得
+            const last_trial = jsPsych.data.get().last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            return JSON.stringify(last_res) !== JSON.stringify(correct); // 間違っていたらtrue(エラー表示)
+            
+            // JSON.stringifyで配列の中身を比較
+            if(JSON.stringify(last_trial.response) !== JSON.stringify(correct)) {
+                return true; // 不正解ならエラー画面(timeline)を実行
+            } else {
+                return false; // 正解ならエラー画面はスキップ
+            }
         }
     };
 
-    // チュートリアル1のループ（正解するまで繰り返す）
+    // ループノード: 試行とエラー判定をセットにして、間違えている限りループする
     const tutorial_1_loop = {
         timeline: [trial_tut_1, conditional_error_1],
-        loop_function: function(data) {
-            const last_res = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0].response;
+        loop_function: function() {
+            // ここでは last(2) を使わないといけません。
+            // 理由は、エラー画面が出た場合、last(1) は「エラー画面」のデータになってしまうからです。
+            // task名を指定して抽出するのが一番安全です。
+            const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0];
             const correct = ["1", "2", "3", "4"];
-            return JSON.stringify(last_res) !== JSON.stringify(correct); // 間違っていたらtrue(ループ継続)
+            
+            if(JSON.stringify(last_tut_data.response) !== JSON.stringify(correct)) {
+                return true; // 不正解なら最初に戻ってループ
+            } else {
+                return false; // 正解ならループを抜ける
+            }
         }
     };
     
-    // タイムラインに追加
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p>はじめに、操作の練習を行います。<br>Enterキーを押して進んでください。</p>',
@@ -249,9 +257,6 @@
         stimulus: '<h2>正解です！</h2><p>Enterキーを押して次の練習に進んでください。</p>',
         choices: ['Enter']
     });
-
-    // --- チュートリアル2 (1→1→2→3) ---
-    // （※同じように作成できます。今回はデモのため割愛して本番へ繋ぎます）
 
     // --- 本計測 (Trial) ---
     const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
