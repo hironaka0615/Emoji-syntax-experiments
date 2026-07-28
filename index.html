@@ -249,6 +249,17 @@
                 form.reportValidity();
             }
         }
+        // ▼scriptタグの一番下に追加する部分▼
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxQachr1n4ErMepWy2baLeT6A2oPDwkdCxnTVIvkdxi8moQ8H59EEVaopLqNcMxvFv9dg/exec';
+
+function sendData(experimentData) {
+    fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(experimentData)
+    })
+    // ...略（thenやcatchの処理）...
+}
     </script>
 
 </body>
