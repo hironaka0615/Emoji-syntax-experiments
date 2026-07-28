@@ -284,10 +284,14 @@
             })
             .then(response => {
                 console.log('送信成功:', response);
-                alert('回答が完了しました！データがスプレッドシートに送信されました。');
+                alert('回答が完了しました！実験プログラムへ移動します。');
                 
-                // ※ここに、実際の実験プログラム画面へ遷移するコードを追加します
+                // 参加者IDを生成して一時保存（アンケートデータと実験データを紐づけるため）
+                const participantId = "ID_" + Date.now();
+                sessionStorage.setItem("participantId", participantId); 
                 
+                // 同じフォルダにある「experiment.html」へ移動する
+                window.location.href = "experiment.html"; 
             })
             .catch(error => {
                 console.error('送信エラー:', error);
