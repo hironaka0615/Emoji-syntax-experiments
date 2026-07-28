@@ -23,7 +23,7 @@
         #prompt-text {
             font-size: 22px;
             margin-bottom: 50px;
-            height: 60px;
+            height: 80px;
         }
         .choice-grid {
             display: grid;
@@ -114,7 +114,6 @@
                 let start_time = performance.now();
                 let is_finished = false;
                 
-                // ★誤爆防止：画面表示から0.5秒間はEnterを無視するフラグ
                 let can_enter = false;
                 setTimeout(() => { can_enter = true; }, 500); 
 
@@ -125,20 +124,14 @@
                     }
                 };
 
+                // マウスクリックでの入力処理
                 const handleInput = (val) => {
                     if(is_finished) return;
                     if(rt_first === null) rt_first = performance.now() - start_time;
                     
-                    if(val === '❌') {
-                        selected = [];
-                        backspace_count++;
-                    } else if (val === '⬅️') {
-                        selected.pop();
-                        backspace_count++;
-                    } else {
-                        if(selected.length < max_slots) {
-                            selected.push(val);
-                        }
+                    // すべての入力を「通常の絵文字」として扱う（❌や⬅️も枠に入る）
+                    if(selected.length < max_slots) {
+                        selected.push(val);
                     }
                     updateSlots();
                 };
@@ -149,22 +142,21 @@
                     });
                 });
 
-                // ★修正点：シンプルに keydown（押し込んだ瞬間）だけを見る
+                // キーボードの処理（削除は物理Backspaceキーのみ）
                 const keydownHandler = (e) => {
                     if (is_finished) return;
 
                     if (e.key === 'Backspace') {
                         e.preventDefault();
-                        handleInput('⬅️');
+                        if(selected.length > 0) {
+                            selected.pop(); // 物理キーで1つ消す
+                            backspace_count++;
+                            updateSlots();
+                        }
                     } else if (e.key === 'Enter') {
                         e.preventDefault();
-                        
-                        // 画面が出て0.5秒以内なら無視
                         if (!can_enter) return;
-                        
-                        // キー押しっぱなしによる連続入力なら無視
                         if (e.repeat) return; 
-                        
                         finishTrial();
                     }
                 };
@@ -188,7 +180,7 @@
                 const btn = document.getElementById('btn-finish');
                 if(btn) {
                     btn.addEventListener('click', () => {
-                        if (can_enter) finishTrial(); // ボタンも0.5秒の誤爆防止を適用
+                        if (can_enter) finishTrial();
                     });
                 }
             }
@@ -197,11 +189,13 @@
 
     const timeline = [];
 
-    // --- チュートリアル1 ---
-    const tutorial_1_prompt = '以下に表示される数字画像をクリックし、「1→2→3→4」の順番になるように並べ替えましょう。<br>入力が完了したら、Enterキーまたは「完了」ボタンを押してください。';
-    const tutorial_1_choices = ['❌', '⬅️', '1', '2', '3', '4'];
+    // ==========================================
+    // チュートリアル1 (1→2→3→4)
+    // ==========================================
+    const tutorial_1_prompt = '以下に表示される数字画像をクリックし、「1→2→3→4」の順番になるように並べ替えましょう。<br>（入力を取り消す場合は、キーボードのBackspaceキーを押してください）<br>入力が完了したら、Enterキーまたは「完了」ボタンを押してください。';
+    const tutorial_choices = ['1', '2', '3', '4'];
     
-    const trial_tut_1 = createEmojiTrial('tutorial_1', tutorial_1_prompt, tutorial_1_choices, 8);
+    const trial_tut_1 = createEmojiTrial('tutorial_1', tutorial_1_prompt, tutorial_choices, 8);
 
     const error_screen_1 = {
         type: jsPsychHtmlKeyboardResponse,
@@ -235,11 +229,53 @@
     timeline.push(tutorial_1_loop);
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h2>正解です！</h2><p>Enterキーを押して次の練習に進んでください。</p>',
+        choices: ['Enter']
+    });
+
+    // ==========================================
+    // チュートリアル2 (1→1→2→3)
+    // ==========================================
+    const tutorial_2_prompt = '同じ画像は何度でもクリックして選ぶことができます。<br>以下に表示される数字画像を「1→1→2→3」の順番になるように並べ替えましょう。<br>入力が完了したら、Enterキーまたは「完了」ボタンを押してください。';
+    
+    const trial_tut_2 = createEmojiTrial('tutorial_2', tutorial_2_prompt, tutorial_choices, 8);
+
+    const error_screen_2 = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p>',
+        choices: ['Enter']
+    };
+    
+    const conditional_error_2 = {
+        timeline: [error_screen_2],
+        conditional_function: function() {
+            const last_trial = jsPsych.data.get().last(1).values()[0];
+            const correct = ["1", "1", "2", "3"]; // 正解配列を変更
+            return JSON.stringify(last_trial.response) !== JSON.stringify(correct);
+        }
+    };
+
+    const tutorial_2_loop = {
+        timeline: [trial_tut_2, conditional_error_2],
+        loop_function: function() {
+            // task名を 'tutorial_2' で絞り込む
+            const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_2'}).last(1).values()[0];
+            const correct = ["1", "1", "2", "3"];
+            return JSON.stringify(last_tut_data.response) !== JSON.stringify(correct);
+        }
+    };
+
+    timeline.push(tutorial_2_loop);
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<h2>正解です！</h2><p>Enterキーを押して本番に進んでください。</p>',
         choices: ['Enter']
     });
 
-    // --- 本計測 (Trial) ---
+
+    // ==========================================
+    // 本計測 (Trial)
+    // ==========================================
     const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
     const stimuli_list = [
         { prompt: "男の子がリンゴを切る" },
