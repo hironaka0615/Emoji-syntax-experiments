@@ -78,7 +78,6 @@
     </style>
 </head>
 <body>
-    <!-- jsPsychによってこの中に実験画面が生成されます -->
 </body>
 <script>
     // -----------------------------------------------------------------
@@ -86,12 +85,12 @@
     // -----------------------------------------------------------------
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // 本番のデータ（とチュートリアル）を抽出する
+            // ★変更：チュートリアル(tutorial_1, tutorial_2)を除外し、
+            // PracticeとMain Trialのデータだけを抽出して保存するようにしました
             const exp_data = jsPsych.data.get().filterCustom(function(trial){
-                return trial.task === 'tutorial_1' || trial.task === 'tutorial_2' || trial.task === 'main_trial';
+                return trial.task === 'practice' || trial.task === 'main_trial';
             }).values();
 
-            // 画面を「送信中」のメッセージに切り替える
             document.body.innerHTML = `
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
                     <h2>実験が終了しました。</h2>
@@ -100,8 +99,8 @@
                 </div>
             `;
 
-            // ▼ ここに新しく作った【統合版】のGASのURLを貼り付けます ▼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwtal0J1fanLGINlp0GWe7Y7NNyZ_xqvRXecGPIDKhsZhdDGz-GxV36FzAPI1r4TDMoYw/exec';
+            // ▼ ここにGAS（統合版）のURLを貼り付けてください ▼
+            const scriptURL = 'https://script.google.com/macros/s/ここにURLを貼り付けてください/exec';
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -120,7 +119,7 @@
     });
 
     // -----------------------------------------------------------------
-    // 2. 試行を作成する「雛形」の関数
+    // 2. 試行を作成する関数
     // -----------------------------------------------------------------
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
@@ -222,6 +221,7 @@
     }
 
     const timeline = [];
+    const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
 
     // ==========================================
     // チュートリアル1 (1→2→3→4)
@@ -306,26 +306,81 @@
     });
 
     // ==========================================
-    // 本計測 (Trial)
+    // 練習 (Practice)
     // ==========================================
-    const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
-    const stimuli_list = [
-        { prompt: "男の子がリンゴを切る" },
-        { prompt: "女の子が犬を走らせる" }
-    ];
-
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>本番です。</h2><p>Enterキーを押して始めてください。</p>',
+        stimulus: '<h2>絵文字を用いた本番形式の練習</h2><p>以下の日本語文を絵文字を並べて表して下さい。<br>絵文字を並べ終えたらEnterキーを押してください。</p><p>Enterキーを押して始めます。</p>',
         choices: ['Enter']
     });
 
-    for (let i = 0; i < stimuli_list.length; i++) {
+    // ▼ ★★★ ここに Practice 用の刺激文を貼り付けます ★★★ ▼
+    const practice_stimuli = [
+        { prompt: "男の子がリンゴを切る" },
+{ prompt: "男の子がリンゴを切った" },
+{ prompt: "女の子が手紙を書く" },
+{ prompt: "手紙を女の子が書く" },
+{ prompt: "女の子が複数の手紙を書く" },
+{ prompt: "男の子が犬を追いかける" },
+{ prompt: "男の子が犬を追いかけない" },
+{ prompt: "複数の男の子が犬を追いかける" },
+{ prompt: "女の子が猫を探さない" },
+{ prompt: "猫を女の子が探す" },
+{ prompt: "女の子が複数の猫を探す" },
+    ];
+
+    for (let i = 0; i < practice_stimuli.length; i++) {
         timeline.push(
-            createEmojiTrial('main_trial', stimuli_list[i].prompt, emoji_choices, 9)
+            createEmojiTrial('practice', practice_stimuli[i].prompt, emoji_choices, 9)
         );
     }
 
+    // ==========================================
+    // 本計測 (Main Trial)
+    // ==========================================
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<h2>本番です。24試行あります。</h2><p>Enterキーを押して始めてください。</p>',
+        choices: ['Enter']
+    });
+
+    // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
+    const main_stimuli = [
+        { prompt: "男の子がリンゴを切る" },
+{ prompt: "男の子がリンゴを切らない" },
+{ prompt: "男の子がリンゴを切った" },
+{ prompt: "リンゴを男の子が切る" },
+{ prompt: "男の子が複数のリンゴを切る" },
+{ prompt: "複数の男の子がリンゴを切る" },
+{ prompt: "女の子が手紙を書く" },
+{ prompt: "女の子が手紙を書かない" },
+{ prompt: "女の子が手紙を書いた" },
+{ prompt: "手紙を女の子が書く" },
+{ prompt: "女の子が複数の手紙を書く" },
+{ prompt: "複数の女の子が手紙を書く" },
+{ prompt: "男の子が犬を追いかける" },
+{ prompt: "男の子が犬を追いかけない" },
+{ prompt: "男の子が犬を追いかけた" },
+{ prompt: "犬を男の子が追いかける" },
+{ prompt: "男の子が複数の犬を追いかける" },
+{ prompt: "複数の男の子が犬を追いかける" },
+{ prompt: "女の子が猫を探す" },
+{ prompt: "女の子が猫を探さない" },
+{ prompt: "女の子が猫を探した" },
+{ prompt: "猫を女の子が探す" },
+{ prompt: "女の子が複数の猫を探す" },
+{ prompt: "複数の女の子が猫を探す" },
+    ];
+
+    for (let i = 0; i < main_stimuli.length; i++) {
+        timeline.push(
+            createEmojiTrial('main_trial', main_stimuli[i].prompt, emoji_choices, 9)
+        );
+    }
+
+    // -----------------------------------------------------------------
+    // 実行
+    // -----------------------------------------------------------------
     const participantId = sessionStorage.getItem("participantId") || "TEST_ID";
     jsPsych.data.addProperties({
         participant_id: participantId
