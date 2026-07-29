@@ -77,26 +77,21 @@
         }
     </style>
 </head>
-<body></body>
-
-
-    function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
-        return {
-            type: jsPsychHtmlKeyboardResponse,
-            choices: "NO_KEYS", 
-            data: { task: task_name }, 
-            stimulus: function() {<script>
+<body>
+    <!-- jsPsychによってこの中に実験画面が生成されます -->
+</body>
+<script>
     // -----------------------------------------------------------------
     // 1. jsPsychの初期化（実験終了時の処理）
     // -----------------------------------------------------------------
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // 1. 本番のデータ（とチュートリアル）を抽出する
+            // 本番のデータ（とチュートリアル）を抽出する
             const exp_data = jsPsych.data.get().filterCustom(function(trial){
                 return trial.task === 'tutorial_1' || trial.task === 'tutorial_2' || trial.task === 'main_trial';
             }).values();
 
-            // 2. 画面を「送信中」のメッセージに切り替える
+            // 画面を「送信中」のメッセージに切り替える
             document.body.innerHTML = `
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
                     <h2>実験が終了しました。</h2>
@@ -105,9 +100,8 @@
                 </div>
             `;
 
-            // 3. GAS（スプレッドシート）へデータを送信する
-            // ▼ ここに新しく作った実験用のGASのURLを貼り付けます ▼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwtal0J1fanLGINlp0GWe7Y7NNyZ_xqvRXecGPIDKhsZhdDGz-GxV36FzAPI1r4TDMoYw/exec';
+            // ▼ ここに新しく作った【統合版】のGASのURLを貼り付けます ▼
+            const scriptURL = 'https://script.google.com/macros/s/ここにURLを貼り付けてください/exec';
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -115,12 +109,10 @@
                 body: JSON.stringify(exp_data)
             })
             .then(response => {
-                // 送信完了したら画面の文字を変える
                 document.getElementById('status-text').style.color = "green";
-                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じてください。</b>";
+                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じて終了してください。</b>";
             })
             .catch(error => {
-                // エラー時の処理
                 document.getElementById('status-text').style.color = "red";
                 document.getElementById('status-text').innerHTML = "<b>通信エラーが発生しました。インターネット接続を確認してください。</b>";
             });
@@ -128,6 +120,14 @@
     });
 
     // -----------------------------------------------------------------
+    // 2. 試行を作成する「雛形」の関数
+    // -----------------------------------------------------------------
+    function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
+        return {
+            type: jsPsychHtmlKeyboardResponse,
+            choices: "NO_KEYS", 
+            data: { task: task_name }, 
+            stimulus: function() {
                 let html = `<div id="exp-container">`;
                 html += `<div id="prompt-text">${prompt_text}</div>`;
                 html += `<div class="choice-grid">`;
@@ -161,12 +161,10 @@
                     }
                 };
 
-                // マウスクリックでの入力処理
                 const handleInput = (val) => {
                     if(is_finished) return;
                     if(rt_first === null) rt_first = performance.now() - start_time;
                     
-                    // すべての入力を「通常の絵文字」として扱う（❌や⬅️も枠に入る）
                     if(selected.length < max_slots) {
                         selected.push(val);
                     }
@@ -179,14 +177,13 @@
                     });
                 });
 
-                // キーボードの処理（削除は物理Backspaceキーのみ）
                 const keydownHandler = (e) => {
                     if (is_finished) return;
 
                     if (e.key === 'Backspace') {
                         e.preventDefault();
                         if(selected.length > 0) {
-                            selected.pop(); // 物理キーで1つ消す
+                            selected.pop(); 
                             backspace_count++;
                             updateSlots();
                         }
@@ -287,7 +284,7 @@
         timeline: [error_screen_2],
         conditional_function: function() {
             const last_trial = jsPsych.data.get().last(1).values()[0];
-            const correct = ["1", "1", "2", "3"]; // 正解配列を変更
+            const correct = ["1", "1", "2", "3"]; 
             return JSON.stringify(last_trial.response) !== JSON.stringify(correct);
         }
     };
@@ -295,7 +292,6 @@
     const tutorial_2_loop = {
         timeline: [trial_tut_2, conditional_error_2],
         loop_function: function() {
-            // task名を 'tutorial_2' で絞り込む
             const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_2'}).last(1).values()[0];
             const correct = ["1", "1", "2", "3"];
             return JSON.stringify(last_tut_data.response) !== JSON.stringify(correct);
@@ -308,7 +304,6 @@
         stimulus: '<h2>正解です！</h2><p>Enterキーを押して本番に進んでください。</p>',
         choices: ['Enter']
     });
-
 
     // ==========================================
     // 本計測 (Trial)
