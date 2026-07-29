@@ -305,7 +305,7 @@
         choices: ['Enter']
     });
 
-    // ==========================================
+   // ==========================================
     // 練習 (Practice)
     // ==========================================
     timeline.push({
@@ -315,7 +315,8 @@
     });
 
     // ▼ ★★★ ここに Practice 用の刺激文を貼り付けます ★★★ ▼
-    const practice_stimuli = [
+    // ※ const ではなく let にしています
+    let practice_stimuli = [
         { prompt: "男の子がリンゴを切る" },
 { prompt: "男の子がリンゴを切った" },
 { prompt: "女の子が手紙を書く" },
@@ -327,7 +328,11 @@
 { prompt: "女の子が猫を探さない" },
 { prompt: "猫を女の子が探す" },
 { prompt: "女の子が複数の猫を探す" },
+
     ];
+
+    // ★★★ ここで練習のリストをシャッフルします ★★★
+    practice_stimuli = jsPsych.randomization.shuffle(practice_stimuli);
 
     for (let i = 0; i < practice_stimuli.length; i++) {
         timeline.push(
@@ -345,8 +350,9 @@
     });
 
     // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
+    // ※ const ではなく let にしています
     let main_stimuli = [
-        { prompt: "男の子がリンゴを切る" },
+       { prompt: "男の子がリンゴを切る" },
 { prompt: "男の子がリンゴを切らない" },
 { prompt: "男の子がリンゴを切った" },
 { prompt: "リンゴを男の子が切る" },
@@ -370,11 +376,13 @@
 { prompt: "猫を女の子が探す" },
 { prompt: "女の子が複数の猫を探す" },
 { prompt: "複数の女の子が猫を探す" },
+
     ];
 
-main_stimuli = jsPsych.randomization.shuffle(main_stimuli)
-    
-   for (let i = 0; i < main_stimuli.length; i++) {
+    // ★★★ ここで本番のリストをシャッフルします ★★★
+    main_stimuli = jsPsych.randomization.shuffle(main_stimuli);
+
+    for (let i = 0; i < main_stimuli.length; i++) {
         timeline.push(
             createEmojiTrial('main_trial', main_stimuli[i].prompt, emoji_choices, 9)
         );
@@ -391,3 +399,4 @@ main_stimuli = jsPsych.randomization.shuffle(main_stimuli)
     jsPsych.run(timeline);
 </script>
 </html>
+    
