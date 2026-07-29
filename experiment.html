@@ -345,7 +345,7 @@
     });
 
     // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
-    const main_stimuli = [
+    let main_stimuli = [
         { prompt: "男の子がリンゴを切る" },
 { prompt: "男の子がリンゴを切らない" },
 { prompt: "男の子がリンゴを切った" },
@@ -372,7 +372,9 @@
 { prompt: "複数の女の子が猫を探す" },
     ];
 
-    for (let i = 0; i < main_stimuli.length; i++) {
+main_stimuli = jsPsych.randomization.shuffle(main_stimuli)
+    
+   for (let i = 0; i < main_stimuli.length; i++) {
         timeline.push(
             createEmojiTrial('main_trial', main_stimuli[i].prompt, emoji_choices, 9)
         );
