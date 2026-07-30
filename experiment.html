@@ -110,7 +110,7 @@
             `;
 
             // ▼ ★★★ ここに統合版のGASのURLを貼り付けます ★★★ ▼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwEZnrvenfDW9V-zFZFDp311fjttFHxk_gm5ZgHrDvah9VskocA7wOSrN3Lbv5vaDGVCQ/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxQoQ2xWsu9pyYjgcBfUPW31LxSxIdtcwDPmk_Bur5Ik4UcEzh6SRSLNxHW-tFWE5AByA/exec';
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -219,13 +219,32 @@
                     document.removeEventListener('keydown', keydownHandler);
                     let rt_total = performance.now() - start_time;
                     
-                    jsPsych.finishTrial({
+                    // 現在の刺激データ（Typeや画像名など）を取得して保存データに含める
+                    let trial_data = {
                         prompt: prompt_text,
-                        response: selected, 
-                        rt_first_click: rt_first ? Math.round(rt_first) : null,
-                        rt_total: Math.round(rt_total),
+                        // MATLABの形式に合わせて「->」で繋いだ文字列として保存する
+                        response_str: selected.join(" -> "), 
+                        rt_first_click: rt_first ? Math.round(rt_first) / 1000 : null, // ★MATLABに合わせてミリ秒から秒に変換
+                        rt_total: Math.round(rt_total) / 1000,                         // ★MATLABに合わせて秒に変換
                         backspace_count: backspace_count
-                    });
+                    };
+
+                    // 本番の刺激文にだけ含まれている属性データがあれば、それも追加する
+                    const current_stimulus = main_stimuli.find(s => s.prompt === prompt_text);
+                    if (current_stimulus) {
+                        trial_data.type = current_stimulus.type;
+                        trial_data.neg = current_stimulus.neg;
+                        trial_data.past = current_stimulus.past;
+                        trial_data.scram = current_stimulus.scram;
+                        trial_data.oPlural = current_stimulus.oPlural;
+                        trial_data.sPlural = current_stimulus.sPlural;
+                        trial_data.img1 = current_stimulus.img1;
+                        trial_data.img2 = current_stimulus.img2;
+                        trial_data.img3 = current_stimulus.img3;
+                        trial_data.img4 = current_stimulus.img4;
+                    }
+
+                    jsPsych.finishTrial(trial_data);
                 };
 
                 const btn = document.getElementById('btn-finish');
