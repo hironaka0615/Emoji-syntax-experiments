@@ -305,8 +305,8 @@
         timeline: [error_screen_1],
         conditional_function: function() {
             const last_trial = jsPsych.data.get().last(1).values()[0];
-            const correct = ["1", "2", "3", "4"];
-            return JSON.stringify(last_trial.response) !== JSON.stringify(correct);
+            // ★ response_str を使って文字列で直接判定する
+            return last_trial.response_str !== "1 -> 2 -> 3 -> 4";
         }
     };
 
@@ -314,8 +314,8 @@
         timeline: [trial_tut_1, conditional_error_1],
         loop_function: function() {
             const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_1'}).last(1).values()[0];
-            const correct = ["1", "2", "3", "4"];
-            return JSON.stringify(last_tut_data.response) !== JSON.stringify(correct);
+            // ★ こちらも response_str を使って判定する
+            return last_tut_data.response_str !== "1 -> 2 -> 3 -> 4";
         }
     };
     
@@ -348,8 +348,8 @@
         timeline: [error_screen_2],
         conditional_function: function() {
             const last_trial = jsPsych.data.get().last(1).values()[0];
-            const correct = ["1", "1", "2", "3"]; 
-            return JSON.stringify(last_trial.response) !== JSON.stringify(correct);
+            // ★ response_str を使って判定 (1 -> 1 -> 2 -> 3)
+            return last_trial.response_str !== "1 -> 1 -> 2 -> 3";
         }
     };
 
@@ -357,11 +357,11 @@
         timeline: [trial_tut_2, conditional_error_2],
         loop_function: function() {
             const last_tut_data = jsPsych.data.get().filter({task: 'tutorial_2'}).last(1).values()[0];
-            const correct = ["1", "1", "2", "3"];
-            return JSON.stringify(last_tut_data.response) !== JSON.stringify(correct);
+            // ★ こちらも response_str を使って判定
+            return last_tut_data.response_str !== "1 -> 1 -> 2 -> 3";
         }
     };
-
+    
     timeline.push(tutorial_2_loop);
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
