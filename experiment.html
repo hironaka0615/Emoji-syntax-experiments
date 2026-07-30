@@ -222,6 +222,7 @@
                     // 現在の刺激データ（Typeや画像名など）を取得して保存データに含める
                     let trial_data = {
                         prompt: prompt_text,
+                        response: selected,
                         // MATLABの形式に合わせて「->」で繋いだ文字列として保存する
                         response_str: selected.join(" -> "), 
                         rt_first_click: rt_first ? Math.round(rt_first) / 1000 : null, // ★MATLABに合わせてミリ秒から秒に変換
