@@ -80,16 +80,26 @@
 <body>
 </body>
 <script>
-    // -----------------------------------------------------------------
+// -----------------------------------------------------------------
     // 1. jsPsychの初期化（実験終了時の処理）
     // -----------------------------------------------------------------
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // ★変更：チュートリアル(tutorial_1, tutorial_2)を除外し、
-            // PracticeとMain Trialのデータだけを抽出して保存するようにしました
+            // チュートリアルを除外し、PracticeとMain Trialのデータだけを抽出
             const exp_data = jsPsych.data.get().filterCustom(function(trial){
                 return trial.task === 'practice' || trial.task === 'main_trial';
             }).values();
+
+            // ★追加：試行番号をタスクごとに1から振り直す
+            let practice_count = 1;
+            let main_count = 1;
+            exp_data.forEach(trial => {
+                if (trial.task === 'practice') {
+                    trial.custom_trial_index = practice_count++; // 練習なら1からカウントアップ
+                } else if (trial.task === 'main_trial') {
+                    trial.custom_trial_index = main_count++;     // 本番なら1からカウントアップ
+                }
+            });
 
             document.body.innerHTML = `
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
@@ -99,8 +109,8 @@
                 </div>
             `;
 
-            // ▼ ここにGAS（統合版）のURLを貼り付けてください ▼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwtal0J1fanLGINlp0GWe7Y7NNyZ_xqvRXecGPIDKhsZhdDGz-GxV36FzAPI1r4TDMoYw/exec';
+            // ▼ ここに新しく作った【統合版】のGASのURLを貼り付けます ▼
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzvAQv8m9bAaYfwyvVgPXdGaryozqUrp0W8csea2DdR_0a-BGhAKfLcDhYgl3-bdCJQcQ/exec';
 
             fetch(scriptURL, {
                 method: 'POST',
