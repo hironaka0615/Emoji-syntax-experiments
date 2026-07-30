@@ -410,32 +410,32 @@
         choices: ['Enter']
     });
 
-    // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を Excel から貼り付けます ★★★ ▼
+// ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
     let main_stimuli = [
-{ prompt: "男の子がリンゴを切る" },
-{ prompt: "男の子がリンゴを切らない" },
-{ prompt: "男の子がリンゴを切った" },
-{ prompt: "リンゴを男の子が切る" },
-{ prompt: "男の子が複数のリンゴを切る" },
-{ prompt: "複数の男の子がリンゴを切る" },
-{ prompt: "女の子が手紙を書く" },
-{ prompt: "女の子が手紙を書かない" },
-{ prompt: "女の子が手紙を書いた" },
-{ prompt: "手紙を女の子が書く" },
-{ prompt: "女の子が複数の手紙を書く" },
-{ prompt: "複数の女の子が手紙を書く" },
-{ prompt: "男の子が犬を追いかける" },
-{ prompt: "男の子が犬を追いかけない" },
-{ prompt: "男の子が犬を追いかけた" },
-{ prompt: "犬を男の子が追いかける" },
-{ prompt: "男の子が複数の犬を追いかける" },
-{ prompt: "複数の男の子が犬を追いかける" },
-{ prompt: "女の子が猫を探す" },
-{ prompt: "女の子が猫を探さない" },
-{ prompt: "女の子が猫を探した" },
-{ prompt: "猫を女の子が探す" },
-{ prompt: "女の子が複数の猫を探す" },
-{ prompt: "複数の女の子が猫を探す" },
+        { prompt: "男の子がリンゴを切る", type: 1, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "cut.png", img4: "" },
+        { prompt: "男の子がリンゴを切らない", type: 1, neg: 1, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "cut.png", img4: "Neg.png" },
+        { prompt: "男の子がリンゴを切った", type: 1, neg: 0, past: 1, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "cut.png", img4: "Past.png" },
+        { prompt: "リンゴを男の子が切る", type: 1, neg: 0, past: 0, scram: 1, oPlural: 0, sPlural: 0, img1: "apple.png", img2: "boy.png", img3: "cut.png", img4: "" },
+        { prompt: "男の子が複数のリンゴを切る", type: 1, neg: 0, past: 0, scram: 0, oPlural: 1, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "apple.png", img4: "cut.png" },
+        { prompt: "複数の男の子がリンゴを切る", type: 1, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 1, img1: "boy.png", img2: "boy.png", img3: "apple.png", img4: "cut.png" },
+        { prompt: "女の子が手紙を書く", type: 1, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "letter.png", img3: "write.png", img4: "" },
+        { prompt: "女の子が手紙を書かない", type: 1, neg: 1, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "letter.png", img3: "write.png", img4: "Neg.png" },
+        { prompt: "女の子が手紙を書いた", type: 1, neg: 0, past: 1, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "letter.png", img3: "write.png", img4: "Past.png" },
+        { prompt: "手紙を女の子が書く", type: 1, neg: 0, past: 0, scram: 1, oPlural: 0, sPlural: 0, img1: "letter.png", img2: "girl.png", img3: "write.png", img4: "" },
+        { prompt: "女の子が複数の手紙を書く", type: 1, neg: 0, past: 0, scram: 0, oPlural: 1, sPlural: 0, img1: "girl.png", img2: "letter.png", img3: "letter.png", img4: "write.png" },
+        { prompt: "複数の女の子が手紙を書く", type: 1, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 1, img1: "girl.png", img2: "girl.png", img3: "letter.png", img4: "write.png" },
+        { prompt: "男の子が犬を追いかける", type: 2, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "dog.png", img3: "chase.png", img4: "" },
+        { prompt: "男の子が犬を追いかけない", type: 2, neg: 1, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "dog.png", img3: "chase.png", img4: "Neg.png" },
+        { prompt: "男の子が犬を追いかけた", type: 2, neg: 0, past: 1, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "dog.png", img3: "chase.png", img4: "Past.png" },
+        { prompt: "犬を男の子が追いかける", type: 2, neg: 0, past: 0, scram: 1, oPlural: 0, sPlural: 0, img1: "dog.png", img2: "boy.png", img3: "chase.png", img4: "" },
+        { prompt: "男の子が複数の犬を追いかける", type: 2, neg: 0, past: 0, scram: 0, oPlural: 1, sPlural: 0, img1: "boy.png", img2: "dog.png", img3: "dog.png", img4: "chase.png" },
+        { prompt: "複数の男の子が犬を追いかける", type: 2, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 1, img1: "boy.png", img2: "boy.png", img3: "dog.png", img4: "chase.png" },
+        { prompt: "女の子が猫を探す", type: 2, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "cat.png", img3: "search.png", img4: "" },
+        { prompt: "女の子が猫を探さない", type: 2, neg: 1, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "cat.png", img3: "search.png", img4: "Neg.png" },
+        { prompt: "女の子が猫を探した", type: 2, neg: 0, past: 1, scram: 0, oPlural: 0, sPlural: 0, img1: "girl.png", img2: "cat.png", img3: "search.png", img4: "Past.png" },
+        { prompt: "猫を女の子が探す", type: 2, neg: 0, past: 0, scram: 1, oPlural: 0, sPlural: 0, img1: "cat.png", img2: "girl.png", img3: "search.png", img4: "" },
+        { prompt: "女の子が複数の猫を探す", type: 2, neg: 0, past: 0, scram: 0, oPlural: 1, sPlural: 0, img1: "girl.png", img2: "cat.png", img3: "cat.png", img4: "search.png" },
+        { prompt: "複数の女の子が猫を探す", type: 2, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 1, img1: "girl.png", img2: "girl.png", img3: "cat.png", img4: "search.png" }
     ];
 
     // 本番の順番をシャッフル
