@@ -5,6 +5,7 @@
     <title>絵文字実験</title>
     <script src="https://unpkg.com/jspsych@7.3.4"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <!-- ★プリロード（画像の事前読み込み）プラグインを追加 -->
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
     
@@ -81,24 +82,22 @@
 <body>
 </body>
 <script>
-// -----------------------------------------------------------------
-    // 1. jsPsychの初期化（実験終了時の処理）
+    // -----------------------------------------------------------------
+    // 1. jsPsychの初期化とGASへのデータ送信
     // -----------------------------------------------------------------
     const jsPsych = initJsPsych({
         on_finish: function() {
-            // チュートリアルを除外し、PracticeとMain Trialのデータだけを抽出
             const exp_data = jsPsych.data.get().filterCustom(function(trial){
                 return trial.task === 'practice' || trial.task === 'main_trial';
             }).values();
 
-            // ★追加：試行番号をタスクごとに1から振り直す
             let practice_count = 1;
             let main_count = 1;
             exp_data.forEach(trial => {
                 if (trial.task === 'practice') {
-                    trial.custom_trial_index = practice_count++; // 練習なら1からカウントアップ
+                    trial.custom_trial_index = practice_count++;
                 } else if (trial.task === 'main_trial') {
-                    trial.custom_trial_index = main_count++;     // 本番なら1からカウントアップ
+                    trial.custom_trial_index = main_count++;
                 }
             });
 
@@ -110,7 +109,7 @@
                 </div>
             `;
 
-            // ▼ ここに新しく作った【統合版】のGASのURLを貼り付けます ▼
+            // ▼ ★★★ ここに統合版のGASのURLを貼り付けます ★★★ ▼
             const scriptURL = 'https://script.google.com/macros/s/AKfycbwEZnrvenfDW9V-zFZFDp311fjttFHxk_gm5ZgHrDvah9VskocA7wOSrN3Lbv5vaDGVCQ/exec';
 
             fetch(scriptURL, {
@@ -130,7 +129,7 @@
     });
 
     // -----------------------------------------------------------------
-    // 2. 試行を作成する関数
+    // 2. 試行を作成する関数（画像と文字を自動判別）
     // -----------------------------------------------------------------
     function createEmojiTrial(task_name, prompt_text, choices, max_slots = 9) {
         return {
@@ -142,7 +141,9 @@
                 html += `<div id="prompt-text">${prompt_text}</div>`;
                 html += `<div class="choice-grid">`;
                 choices.forEach(c => {
-                    html += `<div class="choice-item" data-val="${c}">${c}</div>`;
+                    // ★ .png を含む場合は <img> タグに、それ以外(数字など)は文字として表示
+                    let content = c.includes('.png') ? `<img src="${c}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;">` : c;
+                    html += `<div class="choice-item" data-val="${c}">${content}</div>`;
                 });
                 html += `</div>`;
                 html += `<div class="slot-container">`;
@@ -167,10 +168,15 @@
                 const updateSlots = () => {
                     for(let i=0; i<max_slots; i++){
                         const slot = document.getElementById(`slot-${i}`);
-                        if(slot) slot.innerHTML = selected[i] ? selected[i] : "";
+                        if(slot) {
+                            let val = selected[i] ? selected[i] : "";
+                            // ★ 回答枠も .png を含む場合は <img> タグに変換
+                            slot.innerHTML = val.includes('.png') ? `<img src="${val}" style="width:100%; height:100%; object-fit:contain;">` : val;
+                        }
                     }
                 };
 
+                // ★ 画像(×や←も含む)はすべて「絵文字」として回答枠に入る（機能は持たない）
                 const handleInput = (val) => {
                     if(is_finished) return;
                     if(rt_first === null) rt_first = performance.now() - start_time;
@@ -187,6 +193,7 @@
                     });
                 });
 
+                // ★ 取り消し操作は物理的なBackspaceキーのみで行う
                 const keydownHandler = (e) => {
                     if (is_finished) return;
 
@@ -232,7 +239,61 @@
     }
 
     const timeline = [];
-    const emoji_choices = ['❌', '⬅️', '🍎', '👦', '🐱', '🏃', '🔪', '🐶', '👧', '✉️', '👀', '📝'];
+
+    // ▼ ★★★ ここに GitHub にアップロードした画像ファイル名(.png)をすべて並べます ★★★ ▼
+    const emoji_choices = [
+        'Neg.png', // ×の画像ファイル名
+        'Past.png',  // ←の画像ファイル名
+        'apple.png', // リンゴの画像ファイル名
+        'baby.png',   // 赤ちゃんの画像ファイル名
+        'ball.png', // ボールの画像ファイル名
+        'banana.png',  // バナナの画像ファイル名
+        'boy.png', // 男の子の画像ファイル名
+        'cat.png',   // 猫の画像ファイル名
+        'chase.png', // 追いかけるの画像ファイル名
+        'cloth.png',  // 服の画像ファイル名
+        'cooker.png', // 料理人の画像ファイル名
+        'cut.png',   // 切るの画像ファイル名
+        'dog.png', // 犬の画像ファイル名
+        'eat.png',  // 食べるの画像ファイル名
+        'elder_man.png', // おじいさんの画像ファイル名
+        'elephant.png',   // ゾウの画像ファイル名
+        'firefighter.png', // 消防士の画像ファイル名
+        'fish.png',  // 魚の画像ファイル名
+        'girl.png', // 女の子の画像ファイル名
+        'kick.png',   // 蹴るの画像ファイル名
+        'letter.png', // 手紙の画像ファイル名
+        'lion.png',  // ライオンの画像ファイル名
+        'man.png', // 男の人の画像ファイル名
+        'meat.png',   // 肉の画像ファイル名
+        'milk.png', // ミルクの画像ファイル名
+        'monkey.png',  // サルの画像ファイル名
+        'newapaper.png', // 新聞の画像ファイル名
+        'police.png',   // 警察官の画像ファイル名
+        'present.png', // 贈るの画像ファイル名
+        'punch.png',  // 殴るの画像ファイル名
+        'read.png', // 読むの画像ファイル名
+        'search.png',   // 探すの画像ファイル名
+        'suck(drink).png', // 飲むの画像ファイル名
+        'take_photo.png',  // 写真を撮るの画像ファイル名
+        'take_shower.png', // 浴びるの画像ファイル名
+        'tiger.png',   // トラの画像ファイル名
+        'tree.png', // 木の画像ファイル名
+        'wash.png',  // 洗うの画像ファイル名
+        'water.png', // 水の画像ファイル名
+        'woman.png',   // 女の人の画像ファイル名
+        'write.png', // 書くの画像ファイル名
+        
+        // 必要に応じてコンマ(,)で区切って追加してください
+    ];
+
+    // .png ファイルだけを抽出してプリロード（事前読み込み）する
+    const preload_images = emoji_choices.filter(c => c.includes('.png'));
+    timeline.push({
+        type: jsPsychPreload,
+        images: preload_images,
+        message: 'データを読み込んでいます。少々お待ちください...'
+    });
 
     // ==========================================
     // チュートリアル1 (1→2→3→4)
@@ -316,7 +377,7 @@
         choices: ['Enter']
     });
 
-   // ==========================================
+    // ==========================================
     // 練習 (Practice)
     // ==========================================
     timeline.push({
@@ -325,10 +386,9 @@
         choices: ['Enter']
     });
 
-    // ▼ ★★★ ここに Practice 用の刺激文を貼り付けます ★★★ ▼
-    // ※ const ではなく let にしています
+    // ▼ ★★★ ここに Practice 用の刺激文を Excel から貼り付けます ★★★ ▼
     let practice_stimuli = [
-        { prompt: "男の子がリンゴを切る" },
+{ prompt: "男の子がリンゴを切る" },
 { prompt: "男の子がリンゴを切った" },
 { prompt: "女の子が手紙を書く" },
 { prompt: "手紙を女の子が書く" },
@@ -339,10 +399,9 @@
 { prompt: "女の子が猫を探さない" },
 { prompt: "猫を女の子が探す" },
 { prompt: "女の子が複数の猫を探す" },
-
     ];
 
-    // ★★★ ここで練習のリストをシャッフルします ★★★
+    // 練習の順番をシャッフル
     practice_stimuli = jsPsych.randomization.shuffle(practice_stimuli);
 
     for (let i = 0; i < practice_stimuli.length; i++) {
@@ -360,10 +419,10 @@
         choices: ['Enter']
     });
 
-    // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
-    // ※ const ではなく let にしています
+    // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を Excel から貼り付けます ★★★ ▼
     let main_stimuli = [
-       { prompt: "男の子がリンゴを切る" },
+        { prompt: "StimuliText" },
+{ prompt: "男の子がリンゴを切る" },
 { prompt: "男の子がリンゴを切らない" },
 { prompt: "男の子がリンゴを切った" },
 { prompt: "リンゴを男の子が切る" },
@@ -387,10 +446,9 @@
 { prompt: "猫を女の子が探す" },
 { prompt: "女の子が複数の猫を探す" },
 { prompt: "複数の女の子が猫を探す" },
-
     ];
 
-    // ★★★ ここで本番のリストをシャッフルします ★★★
+    // 本番の順番をシャッフル
     main_stimuli = jsPsych.randomization.shuffle(main_stimuli);
 
     for (let i = 0; i < main_stimuli.length; i++) {
@@ -410,4 +468,3 @@
     jsPsych.run(timeline);
 </script>
 </html>
-    
