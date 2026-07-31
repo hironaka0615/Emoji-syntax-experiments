@@ -57,7 +57,7 @@
 
             document.body.innerHTML = `
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
-                    <h2>実験が終了しました。</h2>
+                    <h2>実験②が終了しました。</h2>
                     <p>現在、データを安全に送信しています。この画面を閉じずにお待ちください...</p>
                     <p id="status-text"></p>
                 </div>
@@ -73,7 +73,7 @@
             })
             .then(response => {
                 document.getElementById('status-text').style.color = "green";
-                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じて終了してください。</b>";
+                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！<br>これにて、本実験のすべての項目は終了となります。ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じて実験を終了してください。</b>";
             })
             .catch(error => {
                 document.getElementById('status-text').style.color = "red";
