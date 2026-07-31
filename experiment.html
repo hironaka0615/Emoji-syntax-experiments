@@ -103,7 +103,7 @@
 
             document.body.innerHTML = `
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
-                    <h2>実験が終了しました。</h2>
+                    <h2>実験①が終了しました。</h2>
                     <p>現在、データを安全に送信しています。この画面を閉じずにお待ちください...</p>
                     <p id="status-text" style="color: blue;"></p>
                 </div>
@@ -122,7 +122,8 @@
                 
                 // ▼ ★ここを「終了メッセージ」から「実験②へ進むボタン」に書き換えます！
                 document.getElementById('status-text').innerHTML = `
-                    <b>データの送信が完了しました！<br><br>
+                    <b>実験①のデータの送信が完了しました！<br><br>
+                    <b>下のボタンを押して、次の実験②に進んでください。<br><br>
                     <button onclick="window.location.href='experiment2.html'" style="padding:15px 30px; font-size:20px; cursor:pointer; background-color:#4CAF50; color:white; border:none; border-radius:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                         実験②へ進む
                     </button></b>
@@ -332,7 +333,7 @@
     
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>はじめに、操作の練習を行います。<br>Enterキーを押して進んでください。</p>',
+        stimulus: '<p>はじめに、実験①の操作の練習を行います。<br>Enterキーを押して進んでください。</p>',
         choices: ['Enter']
     });
     timeline.push(tutorial_1_loop);
@@ -413,7 +414,7 @@
     // ==========================================
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>本番です。24試行あります。</h2><p>Enterキーを押して始めてください。</p>',
+        stimulus: '<h2>それでは、実験①の本番です。全部で24試行あります。</h2><p>準備ができたら、Enterキーを押して始めてください。</p>',
         choices: ['Enter']
     });
 
