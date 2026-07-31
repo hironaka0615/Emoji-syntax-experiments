@@ -25,7 +25,12 @@
         #prompt-text {
             font-size: 22px;
             margin-bottom: 50px;
-            height: 80px;
+            min-height: 80px;
+            width: 100%; /* ★追加：画面幅いっぱいに広げる */
+            text-align: center; /* ★追加：テキストを中央揃えにする */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .choice-grid {
             display: grid;
@@ -105,7 +110,7 @@
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
                     <h2>実験①が終了しました。</h2>
                     <p>現在、データを安全に送信しています。この画面を閉じずにお待ちください...</p>
-                    <p id="status-text" style="color: blue;"></p>
+                    <div id="status-text" style="color: blue; margin-top: 20px;"></div>
                 </div>
             `;
 
@@ -122,11 +127,13 @@
                 
                 // ▼ ★ここを「終了メッセージ」から「実験②へ進むボタン」に書き換えます！
                 document.getElementById('status-text').innerHTML = `
-                    <b>実験①のデータの送信が完了しました！<br><br>
-                    <b>下のボタンを押して、次の実験②に進んでください。<br><br>
-                    <button onclick="window.location.href='experiment2.html'" style="padding:15px 30px; font-size:20px; cursor:pointer; background-color:#4CAF50; color:white; border:none; border-radius:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        実験②へ進む
-                    </button></b>
+                    <div style="text-align: center;">
+                        <b>実験①のデータの送信が完了しました！</b><br><br>
+                        下のボタンを押して、次の実験②に進んでください。<br><br>
+                        <button onclick="window.location.href='experiment2.html'" style="padding:15px 30px; font-size:20px; cursor:pointer; background-color:#4CAF50; color:white; border:none; border-radius:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            実験②へ進む
+                        </button>
+                    </div>
                 `;
             })
             .catch(error => {
@@ -146,7 +153,7 @@
             data: { task: task_name }, 
             stimulus: function() {
                 let html = `<div id="exp-container">`;
-               html += `<div id="prompt-text">${prompt_text}</div>`;
+                html += `<div id="prompt-text">${prompt_text}</div>`;
                 
                 // 選択肢が4つ（チュートリアル）の時は4列、それ以外は6列にする
                 let grid_cols = choices.length === 4 ? 4 : 6;
@@ -309,7 +316,7 @@
 
     const error_screen_1 = {
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p>',
+        stimulus: '<div style="text-align: center;"><h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p></div>',
         choices: ['Enter']
     };
     
@@ -333,13 +340,13 @@
     
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>はじめに、実験①の操作の練習を行います。<br>Enterキーを押して進んでください。</p>',
+        stimulus: '<div style="text-align: center;"><p>はじめに、実験①の操作の練習を行います。<br>Enterキーを押して進んでください。</p></div>',
         choices: ['Enter']
     });
     timeline.push(tutorial_1_loop);
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>正解です！</h2><p>Enterキーを押して次の練習に進んでください。</p>',
+        stimulus: '<div style="text-align: center;"><h2>正解です！</h2><p>Enterキーを押して次の練習に進んでください。</p></div>',
         choices: ['Enter']
     });
 
@@ -352,7 +359,7 @@
 
     const error_screen_2 = {
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p>',
+        stimulus: '<div style="text-align: center;"><h2>不正解です。</h2><p>Enterキーを押してもう一度やり直してください。</p></div>',
         choices: ['Enter']
     };
     
@@ -377,7 +384,7 @@
     timeline.push(tutorial_2_loop);
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>正解です！</h2><p>Enterキーを押して本番に進んでください。</p>',
+        stimulus: '<div style="text-align: center;"><h2>正解です！</h2><p>Enterキーを押して本番に進んでください。</p></div>',
         choices: ['Enter']
     });
 
@@ -386,18 +393,18 @@
     // ==========================================
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>絵文字を用いた本番形式の練習</h2><p>以下の日本語文を絵文字を並べて表して下さい。<br>絵文字を並べ終えたらEnterキーを押してください。</p><p>Enterキーを押して始めます。</p>',
+        stimulus: '<div style="text-align: center;"><h2>絵文字を用いた本番形式の練習</h2><p>以下の日本語文を絵文字を並べて表して下さい。<br>絵文字を並べ終えたらEnterキーを押してください。</p><p>Enterキーを押して始めます。</p></div>',
         choices: ['Enter']
     });
 
     // ▼ ★★★ ここに Practice 用の刺激文を Excel から貼り付けます ★★★ ▼
     let practice_stimuli = [
-{ prompt: "男の子がリンゴを切る" },
-{ prompt: "女の子が手紙を書く" },
-{ prompt: "女の子が複数の手紙を書く" },
-{ prompt: "男の子が犬を追いかけない" },
-{ prompt: "女の子が猫を探さない" },
-{ prompt: "猫を女の子が探す" },
+        { prompt: "男の子がリンゴを切る" },
+        { prompt: "女の子が手紙を書く" },
+        { prompt: "女の子が複数の手紙を書く" },
+        { prompt: "男の子が犬を追いかけない" },
+        { prompt: "女の子が猫を探さない" },
+        { prompt: "猫を女の子が探す" },
     ];
 
     // 練習の順番をシャッフル
@@ -414,11 +421,11 @@
     // ==========================================
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<h2>それでは、実験①の本番です。全部で24試行あります。</h2><p>準備ができたら、Enterキーを押して始めてください。</p>',
+        stimulus: '<div style="text-align: center;"><h2>それでは、実験①の本番です。全部で24試行あります。</h2><p>準備ができたら、Enterキーを押して始めてください。</p></div>',
         choices: ['Enter']
     });
 
-// ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
+    // ▼ ★★★ ここに Stimuli(本番) 用の刺激文を貼り付けます ★★★ ▼
     let main_stimuli = [
         { prompt: "男の子がリンゴを切る", type: 1, neg: 0, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "cut.png", img4: "" },
         { prompt: "男の子がリンゴを切らない", type: 1, neg: 1, past: 0, scram: 0, oPlural: 0, sPlural: 0, img1: "boy.png", img2: "apple.png", img3: "cut.png", img4: "Neg.png" },
