@@ -118,10 +118,10 @@
             </div>
 
             <form id="consentForm">
-                <p>上記の内容をすべて読み、計測への参加に同意される場合は以下にチェックをして「次へ進む」をクリックしてください。</p>
+                <p>上記の内容をすべて読み、実験への参加に同意される場合は以下にチェックをして「次へ進む」をクリックしてください。</p>
                 <label>
                     <input type="checkbox" id="agreeCheck" required>
-                    <strong>上記の内容に同意して、計測に参加します。</strong>
+                    <strong>上記の内容に同意して、実験に参加します。</strong>
                 </label>
                 <br><br>
                 <div style="text-align: center;">
@@ -229,7 +229,7 @@
                 document.getElementById('consent-screen').classList.add('hidden');
                 document.getElementById('questionnaire-screen').classList.remove('hidden');
             } else {
-                alert('調査に参加するには、同意のチェックボックスにチェックを入れてください。');
+                alert('実験に参加するには、同意のチェックボックスにチェックを入れてください。');
             }
         }
 
