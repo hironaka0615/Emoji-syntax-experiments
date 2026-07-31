@@ -119,7 +119,14 @@
             })
             .then(response => {
                 document.getElementById('status-text').style.color = "green";
-                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じて終了してください。</b>";
+                
+                // ▼ ★ここを「終了メッセージ」から「実験②へ進むボタン」に書き換えます！
+                document.getElementById('status-text').innerHTML = `
+                    <b>データの送信が完了しました！<br><br>
+                    <button onclick="window.location.href='experiment2.html'" style="padding:15px 30px; font-size:20px; cursor:pointer; background-color:#4CAF50; color:white; border:none; border-radius:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        実験②へ進む
+                    </button></b>
+                `;
             })
             .catch(error => {
                 document.getElementById('status-text').style.color = "red";
@@ -381,16 +388,11 @@
     // ▼ ★★★ ここに Practice 用の刺激文を Excel から貼り付けます ★★★ ▼
     let practice_stimuli = [
 { prompt: "男の子がリンゴを切る" },
-{ prompt: "男の子がリンゴを切った" },
 { prompt: "女の子が手紙を書く" },
-{ prompt: "手紙を女の子が書く" },
 { prompt: "女の子が複数の手紙を書く" },
-{ prompt: "男の子が犬を追いかける" },
 { prompt: "男の子が犬を追いかけない" },
-{ prompt: "複数の男の子が犬を追いかける" },
 { prompt: "女の子が猫を探さない" },
 { prompt: "猫を女の子が探す" },
-{ prompt: "女の子が複数の猫を探す" },
     ];
 
     // 練習の順番をシャッフル
