@@ -59,7 +59,7 @@
                 <div style="text-align:center; margin-top: 20vh; font-family: sans-serif;">
                     <h2>実験②が終了しました。</h2>
                     <p>現在、データを安全に送信しています。この画面を閉じずにお待ちください...</p>
-                    <p id="status-text"></p>
+                    <div id="status-text"></div>
                 </div>
             `;
 
@@ -73,7 +73,13 @@
             })
             .then(response => {
                 document.getElementById('status-text').style.color = "green";
-                document.getElementById('status-text').innerHTML = "<b>データの送信が完了しました！<br>これにて、本実験のすべての項目は終了となります。ご協力ありがとうございました。<br>このウィンドウ(タブ)を閉じて実験を終了してください。</b>";
+                document.getElementById('status-text').innerHTML = `
+                    <div style="text-align: center;">
+                        <b>データの送信が完了しました！<br><br>
+                        これにて、本実験のすべての項目は終了となります。<br>ご協力誠にありがとうございました。<br><br>
+                        このウィンドウ(タブ)を閉じて実験を終了してください。</b>
+                    </div>
+                `;
             })
             .catch(error => {
                 document.getElementById('status-text').style.color = "red";
@@ -183,14 +189,16 @@
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-            <h2>続いて、実験②に進みます。</h2>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p>ー 操作方法の簡単な教示 ー</p>
-            <p>本実験において使用するキー</p>
-            <p><strong>数字キー（1 または 2）</strong>：問題に答える際に選択肢の番号を押す</p>
-            <p><strong>Enterキー</strong>：次の画面へ進む（画面上に指示がある場合）</p>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p>Enterキーを押して次に進んでください。</p>
+            <div style="text-align: center;">
+                <h2>続いて、実験②に進みます。</h2>
+                <hr style="width: 50%; margin: 20px auto;">
+                <p>ー 操作方法の簡単な教示 ー</p>
+                <p>本実験において使用するキー</p>
+                <p><strong>数字キー（1 または 2）</strong>：問題に答える際に選択肢の番号を押す</p>
+                <p><strong>Enterキー</strong>：次の画面へ進む（画面上に指示がある場合）</p>
+                <hr style="width: 50%; margin: 20px auto;">
+                <p>Enterキーを押して次に進んでください。</p>
+            </div>
         `,
         choices: ['Enter']
     });
@@ -198,11 +206,13 @@
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-            <h2>これから実験②の練習課題を行います。</h2>
-            <p>各問題が提示される前に、画面に十字マーク（＋）が表示されます。<br>まずは十字マークを見つめてお待ちください。</p>
-            <p>その後、画面に絵文字の並びが表示されます。<br>その並びを見て、より正しいと思う文を下の2つの選択肢から選び、<br>キーボードの<strong>数字キー「1」または「2」</strong>で解答してください。</p>
-            <p style="color: red; font-weight: bold; margin-top: 20px;">できるだけ速く、正確に判断してください。</p>
-            <p style="margin-top: 30px;">Enterキーを押すと始まります。</p>
+            <div style="text-align: center;">
+                <h2>これから実験②の練習課題を行います。</h2>
+                <p>各問題が提示される前に、画面に十字マーク（＋）が表示されます。<br>まずは十字マークを見つめてお待ちください。</p>
+                <p>その後、画面に絵文字の並びが表示されます。<br>その並びを見て、より正しいと思う文を下の2つの選択肢から選び、<br>キーボードの<strong>数字キー「1」または「2」</strong>で解答してください。</p>
+                <p style="color: red; font-weight: bold; margin-top: 20px;">できるだけ速く、正確に判断してください。</p>
+                <p style="margin-top: 30px;">Enterキーを押すと始まります。</p>
+            </div>
         `,
         choices: ['Enter']
     });
@@ -298,13 +308,15 @@
                 choices: ['Enter'],
                 stimulus: function() {
                     return `
-                        <div style="font-size: 28px; margin-bottom: 20px; color: blue; font-weight: bold;">
-                            あなたが選んだのは ${trial_context.selected_number}番 の<br><br>
-                            「${trial_context.selected_text}」<br><br>
-                            でした。
-                        </div>
-                        <div style="font-size: 20px; color: #666; margin-top: 80px;">
-                            Enterキーを押して次に進みます
+                        <div style="text-align: center;">
+                            <div style="font-size: 28px; margin-bottom: 20px; color: blue; font-weight: bold;">
+                                あなたが選んだのは ${trial_context.selected_number}番 の<br><br>
+                                「${trial_context.selected_text}」<br><br>
+                                でした。
+                            </div>
+                            <div style="font-size: 20px; color: #666; margin-top: 80px;">
+                                Enterキーを押して次に進みます
+                            </div>
                         </div>
                     `;
                 }
@@ -328,14 +340,16 @@
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-            <h2>以上で、練習課題は終了です。</h2>
-            <p>これから、実験②の本計測を行います。</p>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p>ー 操作方法のおさらい ー</p>
-            <p><strong>数字キー（1 または 2）</strong>：選択肢の番号を押す</p>
-            <p><strong>Enterキー</strong>：次の画面へ進む</p>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p>準備ができたら、Enterキーを押して本計測を始めてください。</p>
+            <div style="text-align: center;">
+                <h2>以上で、練習課題は終了です。</h2>
+                <p>これから、実験②の本計測を行います。</p>
+                <hr style="width: 50%; margin: 20px auto;">
+                <p>ー 操作方法のおさらい ー</p>
+                <p><strong>数字キー（1 または 2）</strong>：選択肢の番号を押す</p>
+                <p><strong>Enterキー</strong>：次の画面へ進む</p>
+                <hr style="width: 50%; margin: 20px auto;">
+                <p>準備ができたら、Enterキーを押して本計測を始めてください。</p>
+            </div>
         `,
         choices: ['Enter']
     });
@@ -358,3 +372,4 @@
     jsPsych.run(timeline);
 </script>
 </html>
+
