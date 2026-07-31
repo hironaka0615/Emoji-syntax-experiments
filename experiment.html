@@ -145,8 +145,12 @@
             data: { task: task_name }, 
             stimulus: function() {
                 let html = `<div id="exp-container">`;
-                html += `<div id="prompt-text">${prompt_text}</div>`;
-                html += `<div class="choice-grid">`;
+               html += `<div id="prompt-text">${prompt_text}</div>`;
+                
+                // 選択肢が4つ（チュートリアル）の時は4列、それ以外は6列にする
+                let grid_cols = choices.length === 4 ? 4 : 6;
+                html += `<div class="choice-grid" style="grid-template-columns: repeat(${grid_cols}, 60px);">`;
+                
                 choices.forEach(c => {
                     // ★ .png を含む場合は <img> タグに、それ以外(数字など)は文字として表示
                     let content = c.includes('.png') ? `<img src="${c}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;">` : c;
