@@ -183,7 +183,7 @@
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-            <h2>実験に参加いただきありがとうございます。</h2>
+            <h2>続いて、実験②に進みます。</h2>
             <hr style="width: 50%; margin: 20px auto;">
             <p>ー 操作方法の簡単な教示 ー</p>
             <p>本実験において使用するキー</p>
@@ -198,8 +198,8 @@
     timeline.push({
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-            <h2>これから練習課題を行います。</h2>
-            <p>各問題が提示される前に、画面の中央に十字マーク（＋）が表示されます。<br>まずは十字マークを見つめてお待ちください。</p>
+            <h2>これから実験②の練習課題を行います。</h2>
+            <p>各問題が提示される前に、画面に十字マーク（＋）が表示されます。<br>まずは十字マークを見つめてお待ちください。</p>
             <p>その後、画面に絵文字の並びが表示されます。<br>その並びを見て、より正しいと思う文を下の2つの選択肢から選び、<br>キーボードの<strong>数字キー「1」または「2」</strong>で解答してください。</p>
             <p style="color: red; font-weight: bold; margin-top: 20px;">できるだけ速く、正確に判断してください。</p>
             <p style="margin-top: 30px;">Enterキーを押すと始まります。</p>
@@ -216,7 +216,16 @@
         // 注視点 (1000ms = 1秒)
         const fixation = {
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: '<div style="font-size: 80px;">+</div>',
+            // 選択肢と同じ透明なスペースを下に作ることで、十字（+）を絵文字と全く同じ高さに押し上げます
+            stimulus: `
+                <div class="emoji-container" style="align-items: center; justify-content: center;">
+                    <div style="font-size: 80px; height: 120px; display: flex; align-items: center; color: #333;">+</div>
+                </div>
+                <div class="choices-container" style="visibility: hidden;">
+                    <div class="choice-row">① ダミー</div>
+                    <div class="choice-row">② ダミー</div>
+                </div>
+            `,
             choices: "NO_KEYS",
             trial_duration: 1000,
             data: { task: 'fixation' }
@@ -320,7 +329,7 @@
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
             <h2>以上で、練習課題は終了です。</h2>
-            <p>これから、本計測を行います。</p>
+            <p>これから、実験②の本計測を行います。</p>
             <hr style="width: 50%; margin: 20px auto;">
             <p>ー 操作方法のおさらい ー</p>
             <p><strong>数字キー（1 または 2）</strong>：選択肢の番号を押す</p>
