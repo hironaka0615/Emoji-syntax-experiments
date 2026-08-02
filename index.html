@@ -276,6 +276,7 @@
         function sendData(experimentData) {
             fetch(scriptURL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(experimentData)
             })
